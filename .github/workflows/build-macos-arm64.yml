@@ -1,0 +1,52 @@
+name: Build OpenCC on macOS ARM64
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-12
+    strategy:
+      matrix:
+        platform: [arm64]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Homebrew
+      run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    - name: Install dependencies
+      run: |
+        brew install cmake boost
+
+    - name: Create build directory
+      run: mkdir build
+
+    - name: Run CMake
+      run: |
+        cd build
+        cmake .. -DCMAKE_OSX_ARCHITECTURES=arm64
+
+    - name: Build OpenCC
+      run: |
+        cd build
+        make
+
+    - name: Run tests
+      run: |
+        cd build
+        make test
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: opencc-build
+        path: build/
