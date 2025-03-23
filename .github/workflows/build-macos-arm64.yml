@@ -50,4 +50,3 @@ jobs:
       with:
         name: opencc-build
         path: build/
-        
